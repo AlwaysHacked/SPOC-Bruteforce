@@ -8,9 +8,9 @@ Sachant qu'on a un nombre illimités d'essais de réponses aux QCM et que les qu
 
 ## Outils Python
 
-Pour naviguer sur le web, faire des click ou autre, on utilise la bibliothèque `**Selenium**`
+Pour naviguer sur le web, faire des click ou autre, on utilise la bibliothèque **`Selenium`**
 
-L'utilisation de la bibliothèque nécessite d'avoir `**geckodriver**` (jsp trop ce que c'est, mais il le faut)
+L'utilisation de la bibliothèque nécessite d'avoir **`geckodriver`** (jsp trop ce que c'est, mais il le faut)
 
 ## Partie chiante
 
