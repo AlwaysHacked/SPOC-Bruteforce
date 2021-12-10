@@ -10,29 +10,59 @@ from selenium.webdriver.common.keys import Keys
 from time import sleep as slp
 import re
 
+import Question
+import QuestionList
+
+corrige = "https://ecampus.paris-saclay.fr/mod/hvp/grade.php?id="
+qcm = "https://ecampus.paris-saclay.fr/mod/hvp/view.php?id="
+
+allQuestions = QuestionList()
+
+def answerRandomly(answerButtons) -> None:
+    '''Marks all the visible answerButtons
+    Usefull if checkbox, no distinction is made'''
+
+    for a in answerButtons:
+        if a.is_displayed():
+            a.click()
+
+def answerCorrectly(answerButtons, correctAnswers: list[str]) -> None:
+    '''Clicks on correct answer(s)'''
+
+    count = 0
+    for a in answerButtons:
+        if a.is_displayed() && a.text in correctAnswers :
+            a.click()
+            count += 1
+            if count == len(correctAnswers):
+                return
+
 def answerQuestions() -> None:
-    q = set(re.findall("h5p-mcq\d", fox.page_source))                       # getting questions in set, so there's no repetitions
+    '''shitty shit'''
+
+    questions = set(re.findall("h5p-mcq\d", fox.page_source))               # getting questions in set, so there's no repetitions
     ans = fox.find_elements(By.CLASS_NAME, "h5p-alternative-container")     # getting answers
     next = fox.find_elements(By.CLASS_NAME, "h5p-question-next")
-    # finish = fox.find_element(By.CLASS_NAME, "h5p-question-finish.h5p-joubelui-button")
-    for i in q:
-        for j in q:
-            t = fox.find_element(By.ID, j).text
-            # !! getting the question "l'énoncé"
+
+    for i in questions:
+        for j in questions:
+            enonce = fox.find_element(By.ID, j).text
+            # !! getting the question -> "l'énoncé"
             if len(t) != 0:
-                print(t * bool(len(t)), end='')
-                for a in ans:
-                    if a.is_displayed():
-                        print("\t%s" %a.text)
-                        a.click()
-                        break
-                try : # is it finished ?
+                print(t, end='')
+                if allQuestions.exists(enonce):
+                    q = allQuestions.getQuestion(enonce)
+                    if q.haveBonneReponse():
+                        answerCorrectly(ans, q.getBonnesReponses)
+                else:
+                    answerRandomly(ans)
+
+                try : # no more questions?
                     fox.find_element(By.CLASS_NAME, "h5p-question-finish.h5p-joubelui-button").click()
                     return
                 except :
                     print("", end='')
                     # continue
-
                 for n in next:
                     if n.is_displayed():
                         n.click()
@@ -41,7 +71,41 @@ def answerQuestions() -> None:
 fox = wd.Firefox(executable_path="/home/serge/spoc/geckodriver")
 fox.get("https://ecampus.paris-saclay.fr")
 
-# print()
+file = open('/home/serge/spoc/ids','r')
+ids = file.readlines()
+file.close()
+
+for i in range(len(ids)):
+    ids[i] = ids[i].split()[0]
+
+# looping starts here
+# for i in ids:
+i = ids[0]
+fox.get(qcm + i)
+frame = re.findall("h5p-iframe-[\d]+", fox.page_source)[0]
+fox.switch_to.frame(frame)
+answerQuestions()
+fox.get(corrige + i)
+fox.find_element(By.LINK_TEXT, "Reporter").click()
+questions = fox.find_elements(By.CLASS_NAME, "h5p-reporting-description.h5p-choices-task-description")
+cut_ind = (fox.page_source).find(questions[0].text)
+qes_rep = re.split("\<\/table\>", fox.page_source[cut_ind : ])[ : -1]
+response_boxes = "h5p-choices-alternative"
+responses = {}
+for q in len(questions):
+    qes_rep[q] = re.split("\<tr\>", qes_rep[q])[1 :]
+    for r in qes_rep[q]: # iterate the right number of times
+        response_in_field = fox.find_element(By.CLASS_NAME, response_boxes).text
+
+        qes_rep[q] = qes_rep[q][qes_rep[q].find(response_boxes) + len(repones_boxes) :]
+
+
+q = 0
+rep = fox.find_elements(By.CLASS_NAME, response_boxes)
+response_in_field = fox.find_element(By.CLASS_NAME, response_boxes).text
+
+
+
 input("Log fucking in and press enter on terminal")
 
 fox.find_element(By.XPATH, "/html/body/nav/div/div[1]/section/div/div/div[1]/div[1]/div[2]").click()
