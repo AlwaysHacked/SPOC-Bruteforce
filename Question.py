@@ -7,29 +7,29 @@ class Question:
         self.q = q
         self.r = r
 
-    def getQuestion() -> str:
-        return q
+    def getQuestion(self) -> str:
+        return self.q
 
-    def getBonnesReponses() -> list[str]:
-        return br
+    def getBonnesReponses(self) -> list[str]:
+        return self.br
 
-    def getMauvaisesReponses() -> list[str]:
-        return mr
+    def getMauvaisesReponses(self) -> list[str]:
+        return self.mr
 
-    def haveBonneReponse() -> bool:
-        return len(br) > 0
+    def haveBonneReponse(self) -> bool:
+        return len(self.br) > 0
 
-    def haveMauvaisesReponses() -> bool:
-        return len(mv) > 0
+    def haveMauvaisesReponses(self) -> bool:
+        return len(self.mv) > 0
 
-    def addBonneReponse(rep: str) -> None:
-        br.append(rep)
+    def addBonneReponse(self, rep: str) -> None:
+        self.br.append(rep)
 
-    def addBonnesReponses(rep: list[str]) -> None:
-        for i in rep : br.append(i)
+    def addBonnesReponses(self, rep: list[str]) -> None:
+        for i in rep : self.br.append(i)
 
-    def addMauvaiseReponse(rep: str) -> None:
-        mr.append(rep)
+    def addMauvaiseReponse(self, rep: str) -> None:
+        self.mr.append(rep)
 
     # def
     # def

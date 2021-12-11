@@ -14,7 +14,7 @@ class QuestionList:
         self.delimiter = delimiter
         self.questionList = []
 
-    def importDataFromCSV(fileName: str) -> None:
+    def importDataFromCSV(self, fileName: str) -> None:
         self.dataBase = fileName
         with open(fileName, 'r', encoding='utf8') as file:
             lines = file.readlines()
@@ -22,12 +22,12 @@ class QuestionList:
                 splitted_line = i.split(self.delimiter)
                 question = splitted_line[0]
                 reponses = splitted_line[1].split(rep_delimiter)
-                questionList.append[Question(question, reponses)]
+                self.questionList.append[Question(question, reponses)]
 
-    def importDataFromCSV() -> None:
+    def importDataFromCSV(self, ) -> None:
         importDataFromCSV(self.dataBase)
 
-    def exportDataToCSV(dataBase: list[Question]) -> None:
+    def exportDataToCSV(self, dataBase: list[Question]) -> None:
         with open(self.dataBase, 'w', encoding='utf8') as file:
             file.write('\n'.join([x.q + self.delimiter + rep_delimiter.join(x.r) for x in dataList]))
             # for i in dataBase:
@@ -36,29 +36,29 @@ class QuestionList:
             #         sentence.append(i.r[k] + (rep_delimiter * (k+1) != len(i.r)))   # writing answers seperating with rep_delimiter
             #     file.write(sentence + '\n')
 
-    def addQuestion(q: Question) -> None:
-        questionList.append(q)
+    def addQuestion(self, q: Question) -> None:
+        self.questionList.append(q)
 
     # returns question's index in `questionList` if it exists
     # -1 if it doesn't
-    def getQuestionIndex(enonce: str) -> int:
-        for i in len(questionList):
+    def getQuestionIndex(self, enonce: str) -> int:
+        for i in range(len(self.questionList)):
             if self.quesionList(i).getQuestion() == enonce:
                 return i
         return -1
 
-    def exists(enonce: str) -> bool:
-        return getQuestionIndex(enonce) >= 0  # if there is such question, index is in between [0, len - 1]
+    def exists(self, enonce: str) -> bool:
+        return self.getQuestionIndex(enonce) >= 0  # if there is such question, index is in between [0, len - 1]
 
-    def removeQuestion(q: Question) -> None:
+    def removeQuestion(self, q: Question) -> None:
         if exists(q):
             self.questionList.remove(q)
 
-    def updateQuestion(q: Question) -> None:
+    def updateQuestion(self, q: Question) -> None:
         if exists(q):
-            removeQuestion(q) # deleting by name
-            addQuestion(q)    # adding the whole element
+            self.removeQuestion(q) # deleting by name
+            self.addQuestion(q)    # adding the whole element
 
-    def getQuestion(enonce: str) -> Question:
-        if exists(q):
+    def getQuestion(self, enonce: str) -> Question:
+        if self.exists(q):
             return self.questionList[getQuestionIndex(enonce)]
