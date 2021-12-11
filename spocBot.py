@@ -6,14 +6,17 @@
 from selenium import webdriver as wd
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 from time import sleep as slp
 import re
 
-import Question
+from Question import *
 from QuestionList import *
 
 SLEEP = 1
+WAIT_MAX = 5
 
 corrige = "https://ecampus.paris-saclay.fr/mod/hvp/grade.php?id="
 qcm = "https://ecampus.paris-saclay.fr/mod/hvp/view.php?id="
@@ -48,11 +51,10 @@ def answerQuestions() -> None:
             enonce = fox.find_element(By.ID, j).text
             # !! getting the question -> "l'énoncé"
             if len(enonce) != 0:
-                print(enonce, end='')
                 if allQuestions.exists(enonce):
                     q = allQuestions.getQuestion(enonce)
-                    if q.haveBonneReponse():
-                        answerCorrectly(ans, q.getBonnesReponses)
+                    # if q.haveBonneReponse():
+                    answerCorrectly(ans, q.getAllReponses())
                 else:
                     answerRandomly(ans)
                 try : # no more questions?
@@ -68,6 +70,7 @@ def answerQuestions() -> None:
 
 fox = wd.Firefox(executable_path="/home/serge/spoc/geckodriver")
 fox.get("https://ecampus.paris-saclay.fr/auth/saml2/login.php?wants&idp=a937ff1f50145fee098f32dc3907c247&passive=off")
+wait = WebDriverWait(fox, WAIT_MAX)
 
 with open('ids.txt', 'r') as file:
     ids = file.readlines()
@@ -78,60 +81,67 @@ for i in range(len(ids)):
 input("Press enter after logging in")
 
 # looping starts here
-# for i in ids:
-i = ids[0]
-fox.get(qcm + i)
-frame = re.findall("h5p-iframe-[\d]+", fox.page_source)[0]
-fox.switch_to.frame(frame)
-slp(SLEEP)
+for k in range(4):
+    i = ids[0]
+    fox.get(qcm + i)
+    fox.implicitly_wait(SLEEP)
+    frame = re.findall("h5p-iframe-[\d]+", fox.page_source)[0]
+    fox.switch_to.frame(frame)
 
-answerQuestions()
-fox.get(corrige + i)
-slp(SLEEP)
+    answerQuestions()
+    fox.get(corrige + i)
 
-fox.find_element(By.LINK_TEXT, "Reporter").click()
-questions = fox.find_elements(By.CLASS_NAME, "h5p-reporting-description.h5p-choices-task-description")
-cut_ind = (fox.page_source).find(questions[0].text)
-qes_rep = re.split("\<\/table\>", fox.page_source[cut_ind : ])[ : -1]
-response_boxes = "h5p-choices-alternative"
-responses = {}
-for q in range(len(questions)):
-    qes_rep[q] = re.split("\<tr\>", qes_rep[q])[1 :]
-    for r in qes_rep[q]: # iterate the right number of times
-        response_in_field = fox.find_element(By.CLASS_NAME, response_boxes).text
+    wait.until(EC.element_to_be_clickable((By.LINK_TEXT, "Reporter"))).click()
+    questions = fox.find_elements(By.CLASS_NAME, "h5p-reporting-description.h5p-choices-task-description")
+    questions = [i.text for i in questions]
+    cut_ind = (fox.page_source).find(questions[0])
+    qes_rep = re.split("\<\/table\>", fox.page_source[cut_ind : ])[ : -1]
 
-        qes_rep[q] = qes_rep[q][qes_rep[q].find(response_boxes) + len(repones_boxes) :]
+    responses = fox.find_elements(By.CLASS_NAME, "h5p-choices-alternative")
+    responses = [i.text for i in responses]
+    rep_index = 0
+
+    for q in range(len(questions)):
+        qes_rep[q] = re.split("h5p-choices-alternative", qes_rep[q])[1 :]
+        for r in qes_rep[q]: # iterate the right number of times
+            if "correct" in r :
+                allQuestions.addQuestion(Question(questions[q], responses[rep_index]))
+                # print('\t' + r)
+            rep_index +=1
+        allQuestions.showQuestionsReponses()
+
+allQuestions.exportDataToCSV()
+# allQuestions.showQuestions()
+# print(allQuestions.getQuestions)
 
 
-q = 0
-rep = fox.find_elements(By.CLASS_NAME, response_boxes)
-response_in_field = fox.find_element(By.CLASS_NAME, response_boxes).text
-
-
-
-input("Log fucking in and press enter on terminal")
-
-fox.find_element(By.XPATH, "/html/body/nav/div/div[1]/section/div/div/div[1]/div[1]/div[2]").click()
-print("Dans SPOC")
-input("Allez a la page de QCM que vous devez faire and fucking press enter")
-
-i = -1
-while i == -1:
-    src = fox.page_source              # getting page's html
-    i = src.find("id=\"qcm\"")         # finding qcm's embed source
-    if i == -1 :
-        print("Can't see a qcm")
-        slp(SLEEP)
-
-qcm_site = re.findall("h[\W\w]+\d", src[i : i + 100])[0]
-fox.execute_script('''window.open("%s","_blank");''' % qcm_site) # opening site in a new tab
-
-fox.switch_to.window(fox.window_handles[1]) # switch to new tab
-
-slp(SLEEP)
-
-frame = re.findall("h5p-iframe-[\d]+", fox.page_source)[0]      # finding frame's name
-fox.switch_to.frame(frame)                                      # and switching to it
-
-# loop starts here, through every question, by pressing next button
-answerQuestions()
+#         response_in_field = fox.find_element(By.CLASS_NAME, response_boxes).text
+#
+#         qes_rep[q] = qes_rep[q][qes_rep[q].find(response_boxes) + len(repones_boxes) :]
+#
+# input("Log fucking in and press enter on terminal")
+#
+# fox.find_element(By.XPATH, "/html/body/nav/div/div[1]/section/div/div/div[1]/div[1]/div[2]").click()
+# print("Dans SPOC")
+# input("Allez a la page de QCM que vous devez faire and fucking press enter")
+#
+# i = -1
+# while i == -1:
+#     src = fox.page_source              # getting page's html
+#     i = src.find("id=\"qcm\"")         # finding qcm's embed source
+#     if i == -1 :
+#         print("Can't see a qcm")
+#         slp(SLEEP)
+#
+# qcm_site = re.findall("h[\W\w]+\d", src[i : i + 100])[0]
+# fox.execute_script('''window.open("%s","_blank");''' % qcm_site) # opening site in a new tab
+#
+# fox.switch_to.window(fox.window_handles[1]) # switch to new tab
+#
+# slp(SLEEP)
+#
+# frame = re.findall("h5p-iframe-[\d]+", fox.page_source)[0]      # finding frame's name
+# fox.switch_to.frame(frame)                                      # and switching to it
+#
+# # loop starts here, through every question, by pressing next button
+# answerQuestions()

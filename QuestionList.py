@@ -1,6 +1,6 @@
 import csv
 
-import Question
+from Question import *
 
 rep_delimiter = '~'
 
@@ -9,7 +9,7 @@ class QuestionList:
     dataBase : str
     delimiter : str
 
-    def __init__(self, dataBase="dataFile.csv", delimiter="¤"):
+    def __init__(self, dataBase="QuestionsReponses.csv", delimiter="¤"):
         self.dataBase = dataBase
         self.delimiter = delimiter
         self.questionList = []
@@ -24,28 +24,29 @@ class QuestionList:
                 reponses = splitted_line[1].split(rep_delimiter)
                 self.questionList.append[Question(question, reponses)]
 
-    def importDataFromCSV(self, ) -> None:
+    def importDataFromCSV(self) -> None:
         importDataFromCSV(self.dataBase)
 
-    def exportDataToCSV(self, dataBase: list[Question]) -> None:
+    def exportDataToCSV(self) -> None:
         with open(self.dataBase, 'w', encoding='utf8') as file:
-            file.write('\n'.join([x.q + self.delimiter + rep_delimiter.join(x.r) for x in dataList]))
-            # for i in dataBase:
-            #     sentence = i.q + self.delimiter                                     # writing question seperating with delimiter
-            #     for k in len(i.r):
-            #         sentence.append(i.r[k] + (rep_delimiter * (k+1) != len(i.r)))   # writing answers seperating with rep_delimiter
-            #     file.write(sentence + '\n')
-
-    def addQuestion(self, q: Question) -> None:
-        self.questionList.append(q)
+            for i in range(len(self.questionList)):
+                file.write(self.questionList[i].getQuestion() + self.delimiter + rep_delimiter.join(self.questionList[i].getAllReponses()) + '\n')
 
     # returns question's index in `questionList` if it exists
     # -1 if it doesn't
     def getQuestionIndex(self, enonce: str) -> int:
         for i in range(len(self.questionList)):
-            if self.quesionList(i).getQuestion() == enonce:
+            if self.questionList[i].getQuestion() == enonce:
                 return i
         return -1
+
+    def addQuestion(self, q: Question) -> None:
+        question_ind = self.getQuestionIndex(q.getQuestion())
+        if question_ind >= 0 and not (q.getReponse() in self.questionList[question_ind].getAllReponses()):
+            self.questionList[question_ind].addReponse(q.getReponse())
+            return
+
+        self.questionList.append(q)
 
     def exists(self, enonce: str) -> bool:
         return self.getQuestionIndex(enonce) >= 0  # if there is such question, index is in between [0, len - 1]
@@ -60,5 +61,16 @@ class QuestionList:
             self.addQuestion(q)    # adding the whole element
 
     def getQuestion(self, enonce: str) -> Question:
-        if self.exists(q):
-            return self.questionList[getQuestionIndex(enonce)]
+        if self.exists(enonce):
+            return self.questionList[self.getQuestionIndex(enonce)]
+
+    def getQuestions(self) -> list[Question]:
+        return self.questionList
+
+    def showQuestions(self) -> None:
+        for i in range(len(self.questionList)):
+            print(self.questionList[i].getQuestion())
+
+    def showQuestionsReponses(self) -> None:
+        for i in range(len(self.questionList)):
+            print(self.questionList[i].getQuestion() + '\n\t' + '\n\t'.join(self.questionList[i].getAllReponses()), end = '\n\n')
