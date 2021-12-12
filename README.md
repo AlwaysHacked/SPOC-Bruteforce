@@ -12,9 +12,7 @@ Pour naviguer sur le web, faire des click ou autre, on utilise la bibliothèque 
 
 L'utilisation de la bibliothèque nécessite d'avoir **`geckodriver`** (jsp trop ce que c'est, mais il le faut)
 
-## Partie chiante
+## Format de la base de données
 
-Les feedback des QCM sont envoyés sur zimbra...
-
-Il faut aller récupérer les réponses en suivant le lien...
- 
+Les questions sont séparés des réponses par **`¤`**, et en cas de plusieurs réponses possibles, les réponses entre elles sont séparés par **`~`**
+Chaque ligne comporte une question avec ses réponses

@@ -42,11 +42,11 @@ class QuestionList:
 
     def addQuestion(self, q: Question) -> None:
         question_ind = self.getQuestionIndex(q.getQuestion())
-        if question_ind >= 0 and not (q.getReponse() in self.questionList[question_ind].getAllReponses()):
-            self.questionList[question_ind].addReponse(q.getReponse())
-            return
-
-        self.questionList.append(q)
+        if question_ind >= 0 :
+            if not (q.getReponse() in self.questionList[question_ind].getAllReponses()):
+                self.questionList[question_ind].addReponse(q.getReponse())
+        else:
+            self.questionList.append(q)
 
     def exists(self, enonce: str) -> bool:
         return self.getQuestionIndex(enonce) >= 0  # if there is such question, index is in between [0, len - 1]
