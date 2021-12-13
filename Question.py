@@ -3,9 +3,12 @@ class Question:
     r: list[str]
 
 
-    def __init__(self, q: str, r: list):
+    def __init__(self, q: str, r=[]):
         self.q = q
-        self.r = [r]
+        if r == []:
+            self.r = []
+        else:
+            self.r = [r]
 
     def getQuestion(self) -> str:
         return self.q
@@ -13,8 +16,8 @@ class Question:
     def getAllReponses(self) -> list[str]:
         return self.r
 
-    def getReponse(self):
-        return self.r[0]
+    def getReponse(self, i: int) -> str:
+        return self.r[i]
 
     # def haveReponse(self) -> bool:
     #     return len(self.r) > 0
@@ -22,11 +25,11 @@ class Question:
     def addReponse(self, rep: str) -> None:
         self.r.append(rep)
 
-    # def addReponse(self, q) -> None:
-    #     self.r.append(q.getReponse())
+    def addReponse(self, q) -> None:
+        self.r.append(q.getReponse())
 
     def addMultipleReponses(self, rep: list[str]) -> None:
-        for i in rep : self.br.append(i)
+        for i in rep : self.r.append(i)
 
-    # def
-    # def
+    def printQuestion(self) -> None:
+        print(self.q + '\n\t' + '\n\t'.join(self.r), end = '\n\n')

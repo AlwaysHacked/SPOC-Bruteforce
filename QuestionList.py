@@ -14,18 +14,33 @@ class QuestionList:
         self.delimiter = delimiter
         self.questionList = []
 
-    def importDataFromCSV(self, fileName: str) -> None:
-        self.dataBase = fileName
-        with open(fileName, 'r', encoding='utf8') as file:
-            lines = file.readlines()
-            for i in lines:
-                splitted_line = i.split(self.delimiter)
-                question = splitted_line[0]
-                reponses = splitted_line[1].split(rep_delimiter)
-                self.questionList.append[Question(question, reponses)]
+    # def importDataFromCSV(self, fileName: str) -> None:
+    #     self.dataBase = fileName
+    #     with open(fileName, 'r', encoding='utf8') as file:
+    #         lines = file.readlines()
+    #         for i in lines:
+    #             splitted_line = i.split(self.delimiter)
+    #             question = splitted_line[0]
+    #             reponses = splitted_line[1].split(rep_delimiter)
+    #             self.questionList.append[Question(question, reponses)]
 
     def importDataFromCSV(self) -> None:
-        importDataFromCSV(self.dataBase)
+        # print(self.dataBase)
+        # importDataFromCSV(self, self.dataBase)
+        fileName = self.dataBase
+        with open(fileName, 'r', encoding='utf8') as file:
+            lines = file.readlines()
+            index = 0
+            for i in lines:
+                splitted_line = i.split(self.delimiter)
+                print(splitted_line)
+                question = splitted_line[0]
+                reponses = splitted_line[1].split(rep_delimiter)
+                reponses[-1] = reponses[-1].split('\n')[0]
+                self.addQuestion(Question(question))
+                self.questionList[index].addMultipleReponses(reponses)
+                index += 1
+
 
     def exportDataToCSV(self) -> None:
         with open(self.dataBase, 'w', encoding='utf8') as file:
@@ -43,7 +58,7 @@ class QuestionList:
     def addQuestion(self, q: Question) -> None:
         question_ind = self.getQuestionIndex(q.getQuestion())
         if question_ind >= 0 :
-            if not (q.getReponse() in self.questionList[question_ind].getAllReponses()):
+            if not (q.getReponse(0) in self.questionList[question_ind].getAllReponses()):
                 self.questionList[question_ind].addReponse(q.getReponse())
         else:
             self.questionList.append(q)
@@ -69,8 +84,9 @@ class QuestionList:
 
     def showQuestions(self) -> None:
         for i in range(len(self.questionList)):
-            print(self.questionList[i].getQuestion())
+            print(i, self.questionList[i].getQuestion())
 
     def showQuestionsReponses(self) -> None:
         for i in range(len(self.questionList)):
-            print(self.questionList[i].getQuestion() + '\n\t' + '\n\t'.join(self.questionList[i].getAllReponses()), end = '\n\n')
+            self.questionList[i].printQuestion()
+            # print(self.questionList[i].getQuestion() + '\n\t' + '\n\t'.join(self.questionList[i].getAllReponses()), end = '\n\n')

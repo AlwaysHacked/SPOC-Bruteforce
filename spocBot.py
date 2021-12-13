@@ -12,6 +12,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from time import sleep as slp
 import re
 
+import sys
+
 from Question import *
 from QuestionList import *
 
@@ -22,6 +24,25 @@ corrige = "https://ecampus.paris-saclay.fr/mod/hvp/grade.php?id="
 qcm = "https://ecampus.paris-saclay.fr/mod/hvp/view.php?id="
 
 allQuestions = QuestionList()
+
+error_message = '''
+Need an argument for execution.
+`python3 %s db` to make/update the datalist
+`python3 %s answer` to answer the question with existing datalist\
+''' % (sys.argv[0], sys.argv[0])
+
+number_of_iterations = 0
+
+if len(sys.argv) == 1:
+    print(error_message)
+    sys.exit(1)
+if sys.argv[1] == "db":
+    number_of_iterations = 7
+elif sys.argv[1] == "answer" or sys.argv[1] == 'a':
+    number_of_iterations = 1
+    allQuestions.importDataFromCSV()
+else:
+    print(error_message)
 
 def answerRandomly(answerButtons) -> None:
     '''Marks all the visible answerButtons
@@ -68,22 +89,23 @@ def answerQuestions() -> None:
                         n.click()
                         break
 
-fox = wd.Firefox(executable_path="/home/serge/spoc/geckodriver")
-fox.get("https://ecampus.paris-saclay.fr/auth/saml2/login.php?wants&idp=a937ff1f50145fee098f32dc3907c247&passive=off")
-wait = WebDriverWait(fox, WAIT_MAX)
-
 with open('ids.txt', 'r') as file:
     ids = file.readlines()
 
 for i in range(len(ids)):
     ids[i] = ids[i].split()[0]
+print(ids)
+
+fox = wd.Firefox(executable_path="/home/serge/spoc/geckodriver")
+fox.get("https://ecampus.paris-saclay.fr/auth/saml2/login.php?wants&idp=a937ff1f50145fee098f32dc3907c247&passive=off")
+wait = WebDriverWait(fox, WAIT_MAX)
+
 
 input("Press enter after logging in")
-
 for i in ids:
-    slp(1)
-    for k in range(7):
-        slp(5)
+    # slp(1)
+    for k in range(number_of_iterations):
+        # slp(5)
         fox.get(qcm + i)
         fox.implicitly_wait(SLEEP)
         frame = re.findall("h5p-iframe-[\d]+", fox.page_source)[0]
@@ -91,7 +113,7 @@ for i in ids:
 
         answerQuestions()
 
-        slp(5)
+        # slp(5)
         fox.get(corrige + i)
 
         wait.until(EC.element_to_be_clickable((By.LINK_TEXT, "Reporter"))).click()
@@ -105,7 +127,7 @@ for i in ids:
         rep_index = 0
 
         for q in range(len(questions)):
-            slp(3)
+            # slp(3)
             qes_rep[q] = re.split("h5p-choices-alternative", qes_rep[q])[1 :]
             for r in qes_rep[q]: # iterate the right number of times
                 if "correct" in r :
@@ -114,4 +136,7 @@ for i in ids:
                 rep_index +=1
             # allQuestions.showQuestionsReponses()
             allQuestions.exportDataToCSV()
-            slp(3)
+            # slp(3)
+
+if __name__ == '__main__':
+    pass
