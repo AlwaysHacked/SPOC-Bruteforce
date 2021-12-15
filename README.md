@@ -16,3 +16,11 @@ L'utilisation de la bibliothèque nécessite d'avoir **`geckodriver`** (jsp trop
 
 Les questions sont séparés des réponses par **`¤`**, et en cas de plusieurs réponses possibles, les réponses entre elles sont séparés par **`~`**
 Chaque ligne comporte une question avec ses réponses
+
+### Les modes du programme
+
+Il y a 2 modes d'execution :
+* `answer`  : répondre aux questions en utilisant la base fournie sous nom de *"QuestionsReponses.csv"*
+* `db`      : itérer sur les qcm plusieurs fois et récolter toutes les bonnes réponses 
+
+Pour lancer le script avec l'un des modes `python3 spocBot.py /mode\` 
