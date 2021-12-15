@@ -43,6 +43,7 @@ elif sys.argv[1] == "answer" or sys.argv[1] == 'a':
     allQuestions.importDataFromCSV()
 else:
     print(error_message)
+    sys.exit(1)
 
 def answerRandomly(answerButtons) -> None:
     '''Marks all the visible answerButtons
@@ -94,7 +95,6 @@ with open('ids.txt', 'r') as file:
 
 for i in range(len(ids)):
     ids[i] = ids[i].split()[0]
-print(ids)
 
 fox = wd.Firefox(executable_path="/home/serge/spoc/geckodriver")
 fox.get("https://ecampus.paris-saclay.fr/auth/saml2/login.php?wants&idp=a937ff1f50145fee098f32dc3907c247&passive=off")
@@ -132,11 +132,8 @@ for i in ids:
             for r in qes_rep[q]: # iterate the right number of times
                 if "correct" in r :
                     allQuestions.addQuestion(Question(questions[q], responses[rep_index]))
-                    # print('\t' + r)
                 rep_index +=1
-            # allQuestions.showQuestionsReponses()
             allQuestions.exportDataToCSV()
-            # slp(3)
 
 if __name__ == '__main__':
     pass

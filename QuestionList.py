@@ -25,7 +25,6 @@ class QuestionList:
     #             self.questionList.append[Question(question, reponses)]
 
     def importDataFromCSV(self) -> None:
-        # print(self.dataBase)
         # importDataFromCSV(self, self.dataBase)
         fileName = self.dataBase
         with open(fileName, 'r', encoding='utf8') as file:
@@ -33,7 +32,6 @@ class QuestionList:
             index = 0
             for i in lines:
                 splitted_line = i.split(self.delimiter)
-                print(splitted_line)
                 question = splitted_line[0]
                 reponses = splitted_line[1].split(rep_delimiter)
                 reponses[-1] = reponses[-1].split('\n')[0]
@@ -47,9 +45,9 @@ class QuestionList:
             for i in range(len(self.questionList)):
                 file.write(self.questionList[i].getQuestion() + self.delimiter + rep_delimiter.join(self.questionList[i].getAllReponses()) + '\n')
 
-    # returns question's index in `questionList` if it exists
-    # -1 if it doesn't
     def getQuestionIndex(self, enonce: str) -> int:
+        '''returns question's index in `questionList` if it exists
+        -1 if it doesn't'''
         for i in range(len(self.questionList)):
             if self.questionList[i].getQuestion() == enonce:
                 return i
@@ -59,7 +57,7 @@ class QuestionList:
         question_ind = self.getQuestionIndex(q.getQuestion())
         if question_ind >= 0 :
             if not (q.getReponse(0) in self.questionList[question_ind].getAllReponses()):
-                self.questionList[question_ind].addReponse(q.getReponse())
+                self.questionList[question_ind].addReponse(q.getReponse(0))
         else:
             self.questionList.append(q)
 
@@ -89,4 +87,3 @@ class QuestionList:
     def showQuestionsReponses(self) -> None:
         for i in range(len(self.questionList)):
             self.questionList[i].printQuestion()
-            # print(self.questionList[i].getQuestion() + '\n\t' + '\n\t'.join(self.questionList[i].getAllReponses()), end = '\n\n')
