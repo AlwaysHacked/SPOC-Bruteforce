@@ -21,6 +21,10 @@ Chaque ligne comporte une question avec ses réponses
 
 Il y a 2 modes d'execution :
 * `answer`  : répondre aux questions en utilisant la base fournie sous nom de *"QuestionsReponses.csv"*
-* `db`      : itérer sur les qcm plusieurs fois et récolter toutes les bonnes réponses 
+* `db`      : itérer sur les qcm plusieurs fois et récolter toutes les bonnes réponses
 
-Pour lancer le script avec l'un des modes `python3 spocBot.py /mode\` 
+Pour lancer le script avec l'un des modes `python3 spocBot.py /mode\`
+
+
+### Démonstration
+![screen-gif](./ex.gif)
